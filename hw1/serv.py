@@ -1,4 +1,4 @@
-from socket import *
+from socket import socket, AF_INET, SOCK_STREAM
 import sys
 
 if len(sys.argv) != 3:
@@ -10,16 +10,16 @@ addr = sys.argv[1]
 port = sys.argv[2]
 
 serverSocket = socket(AF_INET, SOCK_STREAM)
-serverSocket.bind(addr, port)
+serverSocket.bind((addr, port))
 serverSocket.listen(1)
 
 print("Server is ready to receive")
 
-data = ""
+data = bytes("", "utf-8")
 
 while True:
   connectionSocket, addr = serverSocket.accept()
-  tempBuff = ""
+  tempBuff = bytes("", "utf-8")
 
   while len(data) != 40:
     tempBuff = connectionSocket.recv(40)
