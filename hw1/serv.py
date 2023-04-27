@@ -2,9 +2,9 @@ from socket import socket, AF_INET, SOCK_STREAM
 import sys
 
 if len(sys.argv) != 3:
-  print(sys.argv)
-  print("Please supply address and port for server to run on")
-  exit(1)
+    print(sys.argv)
+    print("Please supply address and port for server to run on")
+    exit(1)
 
 addr = sys.argv[1]
 port = sys.argv[2]
@@ -18,16 +18,16 @@ print("Server is ready to receive")
 data = bytes("", "utf-8")
 
 while True:
-  connectionSocket, addr = serverSocket.accept()
-  tempBuff = bytes("", "utf-8")
+    connectionSocket, addr = serverSocket.accept()
+    tempBuff = bytes("", "utf-8")
 
-  while len(data) != 40:
-    tempBuff = connectionSocket.recv(40)
-    if not tempBuff:
-      break
-    data += tempBuff
+    while len(data) != 40:
+        tempBuff = connectionSocket.recv(40)
+        if not tempBuff:
+            break
+        data += tempBuff
 
-  data = connectionSocket.recv(4096)
-  print(data)
+    data = connectionSocket.recv(4096)
+    print(data)
 
-  connectionSocket.close()
+    connectionSocket.close()
