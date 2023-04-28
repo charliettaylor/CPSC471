@@ -115,7 +115,7 @@ def download(fileName: str) -> bool:
 
 if len(sys.argv) != 3:
     print(sys.argv)
-    print("Please supply address and port for server to run on")
+    print("Please supply address and port of server to connect to")
     exit(1)
 
 addr = sys.argv[1]
