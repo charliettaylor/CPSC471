@@ -6,7 +6,7 @@ def send_msg(skt: socket, msg: str) -> bool:
     sends a message over a socket
     """
     print(f'sending [{msg}]')
-    b_msg = bytes(msg, "utf-8")
+    b_msg = bytes(msg + "\n", "utf-8")  # Append a newline character
     bytesSent = 0
 
     while bytesSent < len(b_msg):
@@ -17,21 +17,22 @@ def send_msg(skt: socket, msg: str) -> bool:
     return True
 
 
-def recv_msg(skt: socket, length: int = 2) -> str:
+def recv_msg(skt: socket) -> str:
     """
     receives a message over a socket
     """
-    print(f'waiting for msg[{length}]')
+    print(f'waiting for msg')
     msg = ""
     tempBuff = bytes("", "utf-8")
 
-    while len(msg) != length:
-        tempBuff = skt.recv(length)
+    while True:
+        tempBuff = skt.recv(1)
         if not tempBuff:
             break
-        msg += tempBuff.decode("utf-8")
-        if msg[-1] == " ":
+        char = tempBuff.decode("utf-8")
+        if char == "\n":  # Break the loop if a newline character is received
             break
+        msg += char
 
     print(f'received [{msg}]')
     return msg
