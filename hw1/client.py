@@ -65,7 +65,7 @@ def upload(fileName: str) -> bool:
     if not send_command(clientSocket, "UP"):
         return False
 
-    meta = fileName.strip() + " " + str(len(data))
+    meta = fileName.strip() + " " + str(len(data)) + " "
     if not send_metadata(clientSocket, meta):
         return False
 
