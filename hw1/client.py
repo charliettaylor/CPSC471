@@ -9,7 +9,7 @@ def send_command(skt: socket, msg: str) -> bool:
     sends a command over a socket and waits for confirmation
     """
     send_msg(skt, msg)
-    confirm = recv_msg(skt)
+    confirm = recv_msg(skt).strip()
 
     if confirm != "OK":
         print("Server didn't acknowledge command properly")
@@ -24,7 +24,7 @@ def send_metadata(skt: socket, meta: str):
     sends metadata over a socket and waits for confirmation
     """
     send_msg(skt, meta)
-    confirm = recv_msg(skt)
+    confirm = recv_msg(skt).strip()
 
     if confirm != "OK":
         print("Server could not receive metadata")
@@ -39,7 +39,7 @@ def send_file(skt: socket, file: str) -> bool:
     sends a file over a socket and waits for confirmation
     """
     send_msg(skt, file)
-    confirm = recv_msg(skt)
+    confirm = recv_msg(skt).strip()
 
     if confirm != "OK":
         print("Server could not receive file")
@@ -112,6 +112,24 @@ def download(fileName: str) -> bool:
 
     return True
 
+def list_files() -> bool:
+    clientSocket = socket(AF_INET, SOCK_STREAM)
+    clientSocket.connect((addr, port))
+
+    if not send_command(clientSocket, "LIST"):
+        return False
+
+    files_str = recv_msg(clientSocket)
+    files = files_str.split()
+
+    for file in files:
+        print(file)
+
+    send_msg(clientSocket, "OK")  # Send confirmation to the server
+
+    clientSocket.close()
+    return True
+
 
 if len(sys.argv) != 3:
     print(sys.argv)
@@ -123,7 +141,7 @@ port = int(sys.argv[2])
 
 print("Welcome to the file transfer client, do you want to upload or download?")
 while True:
-    print("Enter 'upload' or 'download' to continue, or 'exit' to quit")
+    print("Enter 'upload', 'download', 'list' to continue, or 'exit' to quit")
     command = input()
     if command == "upload":
         print("Please enter the path/name of the file you wish to upload")
@@ -145,6 +163,13 @@ while True:
             print("File downloaded successfully")
         else:
             print("File download failed")
+
+    elif command == "list":
+        print("Listing files on the server:")
+        success = list_files()
+
+        if not success:
+            print("Listing files failed")
 
     elif command == "exit":
         break
