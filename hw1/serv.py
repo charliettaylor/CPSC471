@@ -1,6 +1,7 @@
 from socket import socket, AF_INET, SOCK_STREAM
 import sys
 import os
+import base64
 from common import *
 
 
@@ -11,12 +12,18 @@ def send_listing(skt: socket):
     recv_msg(skt)  # Wait for confirmation from the client
 
 
-def send_file():
-    pass
+def send_file(skt: socket, filename: str):
+    with open(filename, "r") as f:
+        file_data = f.read()
+    encoded_file_data = base64.b64encode(file_data.encode()).decode()
+    send_msg(skt, encoded_file_data)
+    recv_msg(skt)  # Wait for confirmation from the client
 
 
 def receive_file(skt: socket, filename: str, size: int):
-    data = recv_msg(skt)
+    encoded_data = recv_msg(skt)
+    data = base64.b64decode(encoded_data.encode()).decode()
+
     if len(data) == size:
         send_msg(skt, "OK")
         with open(filename, "w") as f:
@@ -66,10 +73,10 @@ while True:
             send_msg(connectionSocket, "OK")
             filename = recv_msg(connectionSocket)
             print(f"client wants to download {filename}")
-            if os.path.isfile(filename):
+            if filename and os.path.isfile(filename):
                 send_msg(connectionSocket, str(os.path.getsize(filename)))
                 recv_msg(connectionSocket)
-                send_file()
+                send_file(connectionSocket, filename)
             else:
                 send_msg(connectionSocket, "0")
         case "LIST":
