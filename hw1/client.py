@@ -112,6 +112,7 @@ def download(fileName: str) -> bool:
 
     return True
 
+
 def list_files() -> bool:
     clientSocket = socket(AF_INET, SOCK_STREAM)
     clientSocket.connect((addr, port))
