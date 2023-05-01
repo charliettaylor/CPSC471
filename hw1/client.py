@@ -1,5 +1,6 @@
 from socket import socket, AF_INET, SOCK_STREAM
 import sys
+import base64
 
 from common import send_msg, recv_msg
 
@@ -38,7 +39,8 @@ def send_file(skt: socket, file: str) -> bool:
     """
     sends a file over a socket and waits for confirmation
     """
-    send_msg(skt, file)
+    encoded_file = base64.b64encode(file.encode()).decode()
+    send_msg(skt, encoded_file)
     confirm = recv_msg(skt).strip()
 
     if confirm != "OK":
@@ -91,7 +93,7 @@ def download(fileName: str) -> bool:
         return False
 
     # receive size of file
-    size = int(recv_msg(clientSocket, 10))
+    size = int(recv_msg(clientSocket))
 
     if size == 0:
         print("File not found")
@@ -103,7 +105,14 @@ def download(fileName: str) -> bool:
         return False
 
     # receive file
-    data = recv_msg(clientSocket, size)
+    received_size = 0
+    encoded_data = ""
+    while received_size < size:
+        chunk = recv_msg(clientSocket)
+        received_size += len(chunk)
+        encoded_data += chunk
+
+    data = base64.b64decode(encoded_data.encode()).decode()
     clientSocket.close()
 
     # write file to disk
